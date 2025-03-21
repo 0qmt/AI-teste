@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pepo Ai - Assistente de Estudos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/marked@11.2.0/marked.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+    }
+    </script>
+</head>
+<body>
+    <header class="dynamic-header">
+        <div class="header-content">
+            <h1><i class="fas fa-robot"></i> Pepo Ai</h1>
+            <p class="subtitle">Seu assistente inteligente para estudos</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="botoes">
+            <button id="tirarFoto" class="btn-primary">
+                <i class="fas fa-camera"></i>
+                <span>Tirar foto</span>
+            </button>
+            <button id="enviarFoto" class="btn-primary">
+                <i class="fas fa-upload"></i>
+                <span>Enviar foto</span>
+            </button>
+            <button id="enviarPrint" class="btn-primary">
+                <i class="fas fa-paste"></i>
+                <span>Enviar print</span>
+            </button>
+            <button id="lerArquivo" class="btn-primary">
+                <i class="fas fa-file-alt"></i>
+                <span>Ler arquivo</span>
+            </button>
+            <button id="outraQuestao" class="btn-secondary" style="display: none;">
+                <i class="fas fa-question"></i>
+                <span>Outra Questão</span>
+            </button>
+        </section>
+
+        <div id="loading" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Processando...</span>
+        </div>
+
+        <section class="respostas">
+            <div class="resposta-container">
+                <div class="resposta-section">
+                    <div class="resposta-header">
+                        <i class="fas fa-link"></i>
+                        <h2>Descrição Básica</h2>
+                    </div>
+                    <div class="resposta-content">
+                        <div id="linksContent"></div>
+                    </div>
+                </div>
+                <div class="resposta-section">
+                    <div class="resposta-header">
+                        <i class="fas fa-book"></i>
+                        <h2>Resumo Detalhado</h2>
+                    </div>
+                    <div class="resposta-content">
+                        <div id="aulaContent"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <input type="file" id="textFileInput" accept=".txt,.pdf,.doc,.docx" style="display: none;">
+
+    <script src="api.js" type="module"></script>
+    <script src="script.js" type="module"></script>
+</body>
+</html>
