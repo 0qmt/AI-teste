@@ -23,8 +23,8 @@ export async function Gemini(input) {
     if (input instanceof File) {
       // Se for uma imagem
       const imagePart = await fileToGenerativePart(input);
-      const prompt1 = " Descreva a imagem, se tiver um texto deixe em negrito a seção de texto e se identificar um produto, separe e coloque um uma seção diferente e coloque em negrito o titulo e a marca do produto";
-      const prompt2 = " Descreva a imagem detalhadamente, se tiver um texto deixe em negrito a seção de texto e se identificar um produto, separe em outra seção e coloque em negrito o titulo e a marca do produto";
+      const prompt1 = " Responda a questao da imagem com certeza, escolha uma alternativa e justifique a resposta, verifique se a alternativa é correta";
+      const prompt2 = " Responda a questao da imagem com certeza, escolha uma alternativa e justifique a resposta, verifique se a alternativa é correta";
       result1 = await model.generateContent([prompt1, imagePart]);
       result2 = await model.generateContent([prompt2, imagePart]);
     } else {
