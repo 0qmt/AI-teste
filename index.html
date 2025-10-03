@@ -3,84 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fandangus - Assistente de Estudos</title>
+    <title>🤖 Chatbot Gemini - Assistente IA Avançado</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/marked@11.2.0/marked.min.js"></script>
-    <script type="importmap">
-    {
-        "imports": {
-            "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-    }
-    </script>
 </head>
 <body>
-    <header class="dynamic-header">
-        <div class="header-content">
-            <h1><i class="fas fa-robot"></i> Fandangus </h1>
-            <p class="subtitle">Seu assistente inteligente para estudos</p>
-        </div>
-    </header>
-
-    <main>
-        <section class="botoes">
-            <button id="tirarFoto" class="btn-primary">
-                <i class="fas fa-camera"></i>
-                <span>Tirar foto</span>
-            </button>
-            <button id="enviarFoto" class="btn-primary">
-                <i class="fas fa-upload"></i>
-                <span>Enviar foto</span>
-            </button>
-            <button id="enviarPrint" class="btn-primary">
-                <i class="fas fa-paste"></i>
-                <span>Enviar print</span>
-            </button>
-            <button id="lerArquivo" class="btn-primary">
-                <i class="fas fa-file-alt"></i>
-                <span>Ler arquivo</span>
-            </button>
-            <button id="outraQuestao" class="btn-secondary" style="display: none;">
-                <i class="fas fa-question"></i>
-                <span>Outra Questão</span>
-            </button>
-        </section>
-
-        <div id="loading" style="display: none;">
-            <i class="fas fa-spinner fa-spin"></i>
-            <span>Processando...</span>
-        </div>
-
-        <section class="respostas">
-            <div class="resposta-container">
-                <div class="resposta-section">
-                    <div class="resposta-header">
-                        <i class="fas fa-link"></i>
-                        <h2>Resposta 1</h2>
+    <div class="app-container">
+        <!-- Header fixo -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🤖 Assistente IA Avançado</h1>
+                <div class="header-center">
+                    <!-- Seletor de Modelo IA -->
+                    <div class="model-selector">
+                        <label for="modelSelect" class="model-label">Modelo:</label>
+                        <select id="modelSelect" class="form-control model-select">
+                            <option value="flash">⚡ Gemini 2.5 Flash</option>
+                            <option value="pro">🧠 Gemini 2.5 Pro</option>
+                        </select>
+                        <button class="btn btn--outline btn--sm model-info-btn" id="modelInfoBtn" title="Informações do Modelo">
+                            ℹ️
+                        </button>
                     </div>
-                    <div class="resposta-content">
-                        <div id="linksContent"></div>
+
+                    <!-- Seletor de Templates -->
+                    <div class="template-selector">
+                        <label for="templateSelect" class="template-label">Template:</label>
+                        <select id="templateSelect" class="form-control template-select">
+                            <option value="geral_br">🇧🇷 Geral BR</option>
+                            <option value="estudos">📚 Tutor de Estudos</option>
+                            <option value="programacao">💻 Programação Sênior</option>
+                            <option value="matematica">🔢 Matemática Rigorosa</option>
+                            <option value="imagem">🖼️ Análise de Imagem</option>
+                            <option value="precisao_max">🎯 Alta Precisão (2x Check)</option>
+                        </select>
+                        <button class="btn btn--outline btn--sm template-info-btn" id="templateInfoBtn" title="Informações dos Templates">
+                            ℹ️
+                        </button>
                     </div>
                 </div>
-                <div class="resposta-section">
-                    <div class="resposta-header">
-                        <i class="fas fa-book"></i>
-                        <h2>Resposta 2</h2>
+                <div class="header-actions">
+                    <button class="btn btn--outline btn--sm" id="toggleConfig" title="Configurar Personalidade">
+                        ⚙️ Config
+                    </button>
+                    <button class="btn btn--secondary btn--sm" id="clearChat" title="Limpar Conversa">
+                        🗑️ Limpar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Modal de informações do modelo -->
+        <div class="modal hidden" id="modelInfoModal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalModelName">Informações do Modelo</h3>
+                    <button class="btn btn--outline btn--sm" id="closeModelModal">❌</button>
+                </div>
+                <div class="modal-body">
+                    <div class="model-info">
+                        <div class="model-description">
+                            <span id="modalModelIcon">⚡</span>
+                            <span id="modalModelDescription">Descrição do modelo</span>
+                        </div>
+                        <div class="model-features">
+                            <h4>Características:</h4>
+                            <ul id="modalModelFeatures"></ul>
+                        </div>
+                        <div class="model-best-for">
+                            <h4>Ideal para:</h4>
+                            <p id="modalModelBestFor">Casos de uso</p>
+                        </div>
                     </div>
-                    <div class="resposta-content">
-                        <div id="aulaContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de informações dos templates -->
+        <div class="modal hidden" id="templateInfoModal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content template-modal">
+                <div class="modal-header">
+                    <h3>📋 Guia de Templates de Prompt</h3>
+                    <button class="btn btn--outline btn--sm" id="closeTemplateModal">❌</button>
+                </div>
+                <div class="modal-body">
+                    <div class="template-guide">
+                        <div class="template-item">
+                            <div class="template-header">
+                                <span class="template-icon">🇧🇷</span>
+                                <strong>Geral BR (Padrão)</strong>
+                            </div>
+                            <p>Assistente brasileiro prestativo e objetivo para uso geral.</p>
+                        </div>
+                        <div class="template-item">
+                            <div class="template-header">
+                                <span class="template-icon">📚</span>
+                                <strong>Tutor de Estudos</strong>
+                            </div>
+                            <p>Especializado em educação com explicações didáticas e planos de estudo.</p>
+                        </div>
+                        <div class="template-item">
+                            <div class="template-header">
+                                <span class="template-icon">💻</span>
+                                <strong>Programação Sênior</strong>
+                            </div>
+                            <p>Desenvolvimento de software com foco em qualidade, testes e boas práticas.</p>
+                        </div>
+                        <div class="template-item">
+                            <div class="template-header">
+                                <span class="template-icon">🔢</span>
+                                <strong>Matemática Rigorosa</strong>
+                            </div>
+                            <p>Resolução matemática com derivação passo a passo e verificação dupla.</p>
+                        </div>
+                        <div class="template-item">
+                            <div class="template-header">
+                                <span class="template-icon">🖼️</span>
+                                <strong>Análise de Imagem</strong>
+                            </div>
+                            <p>Especializado em análise detalhada de imagens e reconhecimento visual.</p>
+                        </div>
+                        <div class="template-item highlight">
+                            <div class="template-header">
+                                <span class="template-icon">🎯</span>
+                                <strong>Alta Precisão (2x Check)</strong>
+                            </div>
+                            <p>Verificação em duas etapas para máxima precisão - processo mais lento mas mais confiável.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de configuração de personalidade (colapsável) -->
+        <section class="personality-config hidden" id="personalityConfig">
+            <div class="config-content">
+                <div class="config-header">
+                    <h3>🎭 Configuração de Personalidade</h3>
+                    <p>Defina como o assistente deve se comportar e responder:</p>
+                </div>
+                <div class="config-form">
+                    <textarea 
+                        id="personalityInput" 
+                        class="form-control personality-textarea"
+                        placeholder="Digite a personalidade personalizada do seu assistente..."
+                        rows="3"
+                    ></textarea>
+                    <div class="config-actions">
+                        <button class="btn btn--primary btn--sm" id="savePersonality">
+                            💾 Salvar Personalidade
+                        </button>
+                        <button class="btn btn--outline btn--sm" id="resetPersonality">
+                            🔄 Resetar Template
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
-    </main>
 
-    <input type="file" id="fileInput" accept="image/*" style="display: none;">
-    <input type="file" id="textFileInput" accept=".txt,.pdf,.doc,.docx" style="display: none;">
+        <!-- Área principal de mensagens -->
+        <main class="chat-main">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <div class="message-text" id="welcomeMessage">
+                            E aí! 👋 Sou seu assistente IA brasileiro avançado. Escolha o modelo e template que preferir, e vamos conversar! Você pode enviar texto, imagens ou usar Ctrl+V para colar.
+                        </div>
+                        <div class="message-time" id="initialTime"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Indicador de carregamento -->
+            <div class="loading-indicator hidden" id="loadingIndicator">
+                <div class="loading-content">
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span id="loadingText">🤖 Processando...</span>
+                </div>
+            </div>
 
-    <script src="api.js" type="module"></script>
-    <script src="script.js" type="module"></script>
+            <!-- Indicador de verificação dupla -->
+            <div class="double-check-indicator hidden" id="doubleCheckIndicator">
+                <div class="double-check-content">
+                    <div class="double-check-steps">
+                        <div class="step active" id="step1">
+                            <div class="step-icon">1️⃣</div>
+                            <span>Rascunho</span>
+                        </div>
+                        <div class="step" id="step2">
+                            <div class="step-icon">2️⃣</div>
+                            <span>Verificação</span>
+                        </div>
+                    </div>
+                    <span id="doubleCheckText">🎯 Verificação dupla ativada...</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Preview de imagem colada/selecionada -->
+        <div class="image-preview hidden" id="imagePreview">
+            <div class="preview-content">
+                <div class="preview-info">
+                    <span id="imageSource">📷 Imagem selecionada</span>
+                    <button class="btn btn--outline btn--sm" id="removeImage">❌ Remover</button>
+                </div>
+                <img id="previewImage" alt="Preview da imagem" />
+            </div>
+        </div>
+
+        <!-- Input fixo na parte inferior -->
+        <footer class="chat-input-section">
+            <div class="chat-input-container">
+                <!-- Template ativo indicador -->
+                <div class="template-indicator" id="templateIndicator">
+                    <span id="currentTemplateIcon">🇧🇷</span>
+                    <span id="currentTemplateName">Geral BR</span>
+                </div>
+                
+                <!-- Botão visível e input de file acessível -->
+                <div class="input-group">
+                    <label for="imageInput" class="btn btn--outline input-btn" id="imageButton" title="Selecionar Imagem" tabindex="0" aria-label="Selecionar imagem">
+                        📷
+                    </label>
+                    <input type="file" id="imageInput" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp" style="display:none;" tabindex="-1">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        class="form-control message-input" 
+                        placeholder="Digite sua mensagem ou cole uma imagem (Ctrl+V)..."
+                        autocomplete="off"
+                    >
+                    <button class="btn btn--primary input-btn" id="sendButton" title="Enviar Mensagem">
+                        📤
+                    </button>
+                </div>
+                <div class="input-hint">
+                    💡 Dica: Use Ctrl+V para colar imagens diretamente ou clique no botão 📷 para selecionar arquivos
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="app.js"></script>
 </body>
 </html>
